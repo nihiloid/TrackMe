@@ -2,13 +2,11 @@ package server
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/pagpeter/trackme/pkg/tls"
 	"github.com/pagpeter/trackme/pkg/types"
-	"github.com/pagpeter/trackme/pkg/utils"
 )
 
 func Log(msg string) {
@@ -41,27 +39,14 @@ func Router(path string, res types.Response, srv *Server) ([]byte, string, error
 		Log(fmt.Sprintf("%v %v %v %v %v", cleanIP(res.IP), res.Method, res.HTTPVersion, res.Path, "-"))
 	}
 
-	u, err := url.Parse("https://tls.peet.ws" + path)
-	var m map[string][]string
-	if err != nil || u == nil {
-		m = make(map[string][]string)
-	} else {
-		m, err = url.ParseQuery(u.RawQuery)
-		if err != nil {
-			m = make(map[string][]string)
-		}
+	// Force all requests to /api/all
+	responseBytes, ctype, err := apiAll(res, nil)
+	if err != nil {
+		return nil, "", err
 	}
 
-	paths := getAllPaths()
-	if u != nil {
-		if val, ok := paths[u.Path]; ok {
-			return val(res, m)
-		}
-	}
-	// 404
-	b, err := utils.ReadFile("static/404.html")
-	if err != nil {
-		return []byte(`{"error": "page not found"}`), "application/json", nil
-	}
-	return []byte(b), "text/html", nil
+	// Log the pretty-printed JSON response asynchronously
+	go LogResponse(responseBytes)
+
+	return responseBytes, ctype, nil
 }
