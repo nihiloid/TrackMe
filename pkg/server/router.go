@@ -20,7 +20,7 @@ func cleanIP(ip string) string {
 }
 
 // Router returns bytes, content type, and error that should be sent to the client
-func Router(path string, res types.Response, srv *Server) ([]byte, string, error) {
+func Router(_ string, res types.Response, srv *Server) ([]byte, string, error) {
 	if v, ok := srv.GetTCPFingerprints().Load(res.IP); ok {
 		res.TCPIP = v.(types.TCPIPDetails)
 	}
