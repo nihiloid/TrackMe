@@ -13,3 +13,4 @@ adminKey
 crashes.txt
 cmd/cmd
 tmp
+log/
