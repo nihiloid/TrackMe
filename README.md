@@ -27,6 +27,10 @@ $ nano config.json
 $ docker build -t "trackme:Dockerfile" .
 $ docker run -p 80:80 -p 443:443 "trackme:Dockerfile"
 ```
+or
+```bash
+$ docker compose up --build
+```
 
 ## Running it (Without Docker)
 
